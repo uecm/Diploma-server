@@ -8,14 +8,14 @@
 import Vapor
 import FluentProvider
 import HTTP
-
+import Foundation.NSJSONSerialization
 
 final class Task: Model {
     var storage = Storage()
     
     var description: String
-    var startDate: Date
-    var endDate: Date
+    var startDate: Double
+    var endDate: Double
 
     var subjectId: Identifier?
     var studentId: Identifier?
@@ -34,7 +34,7 @@ final class Task: Model {
     }
     
     /// Creates a new Subject
-    init(description: String, startDate: Date, endDate: Date) {
+    init(description: String, startDate: Double, endDate: Double) {
         self.description = description
         self.startDate = startDate
         self.endDate = endDate
@@ -83,8 +83,8 @@ extension Task: Preparation {
             builder.foreignId(for: Student.self)
             
             builder.string("description")
-            builder.date("startDate")
-            builder.date("endDate")
+            builder.double("startDate")
+            builder.double("endDate")
         }
     }
     

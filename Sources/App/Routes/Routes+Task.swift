@@ -6,6 +6,7 @@
 //
 
 import Vapor
+import AuthProvider
 
 extension Droplet {
     
@@ -43,8 +44,27 @@ extension Droplet {
             return task
         }
         
-        get("task") { (req) -> ResponseRepresentable in
+        
+        //MARK: get all tasks
+        get("task/all") { (req) -> ResponseRepresentable in
             return try Task.makeQuery().all().makeJSON()
+        }
+        
+        
+        //MARK: get all tasks for authorized user
+        let token = grouped([ TokenAuthenticationMiddleware(User.self) ])
+        token.get("task") { (req) -> ResponseRepresentable in
+            let user = try req.user()
+            
+            let student = try Student.makeQuery().all().filter({ (s) -> Bool in
+                s.profile.parentId == user.id
+            }).first
+
+            let tasks = try Task.makeQuery().all().filter({
+                $0.studentId == student?.id
+            })
+            
+            return try tasks.makeJSON()
         }
     }
     
