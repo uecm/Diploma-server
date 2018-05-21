@@ -11,12 +11,21 @@ import HTTP
 import Foundation.NSJSONSerialization
 
 final class Task: Model {
+    enum TaskStatus: Int {
+        case new = 0
+        case inProgress = 1
+        case pendingReview = 2
+        case completed = 3
+    }
+    
     var storage = Storage()
     
     var description: String
     var startDate: Double
     var endDate: Double
-
+    var status: Int
+    var mark: Int
+    
     var subjectId: Identifier?
     var studentId: Identifier?
     var teacherId: Identifier?
@@ -34,10 +43,12 @@ final class Task: Model {
     }
     
     /// Creates a new Subject
-    init(description: String, startDate: Double, endDate: Double) {
+    init(description: String, startDate: Double, endDate: Double, status: Int, mark: Int) {
         self.description = description
         self.startDate = startDate
         self.endDate = endDate
+        self.status = status
+        self.mark = mark
     }
     
     
@@ -49,6 +60,8 @@ final class Task: Model {
         description = try row.get("description")
         startDate = try row.get("startDate")
         endDate = try row.get("endDate")
+        status = try row.get("status")
+        mark = try row.get("mark")
         
         subjectId = try row.get("subjectId")
         studentId = try row.get("studentId")
@@ -61,6 +74,8 @@ final class Task: Model {
         try row.set("description", description)
         try row.set("startDate", startDate)
         try row.set("endDate", endDate)
+        try row.set("status", status)
+        try row .set("mark", mark)
         
         try row.set("teacherId", teacherId)
         try row.set("subjectId", subjectId)
@@ -85,6 +100,8 @@ extension Task: Preparation {
             builder.string("description")
             builder.double("startDate")
             builder.double("endDate")
+            builder.int("status")
+            builder.int("mark")
         }
     }
     
@@ -106,7 +123,9 @@ extension Task: JSONConvertible {
         try self.init(
             description: json.get("description"),
             startDate: json.get("startDate"),
-            endDate: json.get("endDate")
+            endDate: json.get("endDate"),
+            status: json.get("status"),
+            mark: json.get("mark")
         )
         id = try json.get("id")
     }
@@ -117,6 +136,8 @@ extension Task: JSONConvertible {
         try json.set("description", description)
         try json.set("startDate", startDate)
         try json.set("endDate", endDate)
+        try json.set("status", status)
+        try json.set("mark", mark)
         
         let subject = try Subject.find(subjectId)
         try json.set("subject", subject?.makeJSON())
