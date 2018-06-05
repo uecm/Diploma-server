@@ -1,5 +1,7 @@
 import Vapor
 import AuthProvider
+import Fluent
+import Foundation.NSFileManager
 
 extension Droplet {
     func setupRoutes() throws {
@@ -10,6 +12,7 @@ extension Droplet {
         try setupTeacherRoutes()
         try setupSubjectRoutes()
         try setupTaskRoutes()
+        try setupFileRoutes()
     }
 
     /// Sets up all routes that can be accessed
@@ -114,6 +117,30 @@ extension Droplet {
         token.get("me") { req in
             let user = try req.user()
             return user
+        }
+    }
+    
+    private func setupFileRoutes() throws {
+        
+        get("file/books") { req in
+            // TODO
+            let path = Bundle.main.bundlePath
+            let files = try FileManager.default.contentsOfDirectory(atPath: path ?? "")
+            return try files.makeResponse()
+        }
+        
+        get("file", String.parameter) { (req) in
+            let filename = try req.parameters.next(String.self)
+            return DocumentFile(name: filename)
+        }
+        
+        get("file/download", String.parameter) { req in
+            let filename = try req.parameters.next(String.self)
+            do {
+                return try DataFile().read(at: "Public/Books/\(filename).pdf").base64Encoded.makeString()
+            } catch {
+                throw Abort(.notFound)
+            }
         }
     }
 }

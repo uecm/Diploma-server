@@ -30,4 +30,14 @@ extension Config {
             Teacher.self
         ])
     }
+    
+    
+    static var hostname: String {
+        let file = try! DataFile.read(at: "Config/server.json")
+        let jsonObj = try! JSON(bytes: file)
+        
+        let hostname = try! jsonObj.get("hostname") as String
+        let port = 8080
+        return "\(hostname):\(port)"
+    }
 }
