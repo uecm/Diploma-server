@@ -130,8 +130,9 @@ extension Droplet {
 
         
         // Download a file by path took from query
-        get("file/download", String.parameter) { req in
-            let path = try req.parameters.next(String.self)
+        get("file/download") { req in
+            let json = req.json
+            guard let path = json?["link"]?.string else { throw Abort.badRequest }
             do {
                 return try Response(filePath: path)
             } catch {
