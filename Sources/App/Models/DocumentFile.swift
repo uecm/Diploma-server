@@ -8,30 +8,38 @@
 import Vapor
 import Fluent
 
-
-final class DocumentFile: JSONConvertible {
-    var name: String?
-    var link: String?
-    
-    init(name: String?) {
-        self.name = name
-        self.link = Config.hostname + "/download/" + (name ?? "")
-    }
-    
-    func makeJSON() throws -> JSON {
-        var json = JSON()
-        try json.set("name", name)
-        try json.set("link", link)
-        return json
-    }
-    
-    init(json: JSON) throws {
-        fatalError("Init with JSON is not implemented")
-    }
+protocol DocumentFile: JSONConvertible, ResponseRepresentable {
+    var name: String? { get set }
+    var link: String? { get set }
+    init(_ name: String?)
 }
 
 
-extension DocumentFile: ResponseRepresentable { }
-
+//
+//final class DocumentFile: JSONConvertible {
+//    var name: String?
+//    var link: String?
+//
+//    init(name: String?) {
+//        self.name = name
+//
+//        self.link = Config.hostname + "/download/" + (name ?? "")
+//    }
+//
+//    func makeJSON() throws -> JSON {
+//        var json = JSON()
+//        try json.set("name", name)
+//        try json.set("link", link)
+//        return json
+//    }
+//
+//    init(json: JSON) throws {
+//        fatalError("Init with JSON is not implemented")
+//    }
+//}
+//
+//
+//extension DocumentFile: ResponseRepresentable { }
+//
 
 
