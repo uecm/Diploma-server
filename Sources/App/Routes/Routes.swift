@@ -122,25 +122,36 @@ extension Droplet {
     
     private func setupFileRoutes() throws {
         
-        get("file/books") { req in
-            let path = workingDirectory() + "/Public/Books"
-            let files = try FileManager.default.contentsOfDirectory(atPath: path)
-            let books = files.map{ DocumentFile.init(name: $0) }
-            return try books.makeJSON()
-        }
-        
-        get("file", String.parameter) { (req) in
-            let filename = try req.parameters.next(String.self)
-            return DocumentFile(name: filename)
-        }
-        
-        get("file/download/book", String.parameter) { req in
-            let filename = try req.parameters.next(String.self)
+
+        // Download a file by path took from query
+        post("file/download") { req in
+            
+            guard let path = req.json?["path"]?.string else {
+                throw Abort.badRequest
+            }
+            
             do {
-                return try DataFile().read(at: "Public/Books/\(filename)").base64Encoded.makeString()
+                return try Response(filePath: workingDirectory() + path)
             } catch {
                 throw Abort(.notFound)
             }
+        }
+        
+        // Get all the book names from Public/Books/ dir
+        get("file/books") { req in
+            let json = try DocumentManager.books().makeJSON()
+            return json
+        }
+        
+        // Upload a book
+        post("file/book") { (req) -> ResponseRepresentable in
+            guard
+                let book = req.data["book"]?.bytes,
+                let name = req.data["name"]?.string else {
+                    throw Abort.badRequest
+            }
+            try DocumentManager.saveBook(book, name: name)
+            return Response(status: .ok)
         }
     }
 }
