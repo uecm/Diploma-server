@@ -10,7 +10,7 @@ import Fluent
 
 protocol DocumentFile: JSONConvertible, ResponseRepresentable {
     var name: String? { get set }
-    var link: String? { get set }
+    var path: String? { get set }
     init(_ name: String?)
 }
 

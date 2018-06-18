@@ -10,18 +10,18 @@ import Fluent
 
 final class Book: DocumentFile {
     var name: String?
-    var link: String?
+    var path: String?
     
     init(_ name: String?) {
         self.name = name
-        self.link = DocumentManager.linkForBook(named: name ?? "")
+        self.path = DocumentManager.pathForBook(named: name ?? "")
     }
     
     func makeJSON() throws -> JSON {
         var json = JSON()
         
         try json.set("name", name)
-        try json.set("link", link)
+        try json.set("path", path)
         
         return json
     }

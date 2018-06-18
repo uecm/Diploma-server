@@ -28,7 +28,7 @@ class DocumentManager {
         } catch { throw Abort.serverError }
     }
     
-    static func linkForBook(named name: String) -> String {
+    static func pathForBook(named name: String) -> String {
         return bookFolder + name
     }
 }
