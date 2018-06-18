@@ -66,6 +66,43 @@ extension Droplet {
             
             return try tasks.makeJSON()
         }
+        
+        
+        
+        //MARK: - Task attachments
+        
+        token.post("task/attachment") { (req) -> ResponseRepresentable in
+            guard
+                let taskId = req.data["taskId"]?.string,
+                let data = req.data["data"]?.bytes else {
+                    throw Abort.badRequest
+            }
+            
+            guard let task = try Task.find(taskId) else {
+                throw Abort(.badRequest, reason: "Task with such id does not exist")
+            }
+        
+            let attachment = TaskAttachment(data: data)
+            attachment.taskId = task.id
+            
+            try attachment.save()
+    
+            return Response.init(status: .ok)
+        }
+        
+        
+        token.get("task/attachments/", Int.parameter) { (req) -> ResponseRepresentable in
+            let taskId = try req.parameters.next(Int.self)
+            
+            guard let task = try Task.find(taskId) else {
+                throw Abort(.badRequest, reason: "Task with such id does not exist")
+            }
+            
+            let attachments = try task.attachments.all()
+           
+            return try attachments.makeJSON()
+        }
+        
     }
     
 }

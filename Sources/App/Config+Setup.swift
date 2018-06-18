@@ -27,7 +27,8 @@ extension Config {
             Student.self,
             Subject.self,
             Task.self,
-            Teacher.self
+            Teacher.self,
+            TaskAttachment.self
         ])
     }
     

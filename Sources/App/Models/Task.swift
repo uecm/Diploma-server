@@ -42,6 +42,10 @@ final class Task: Model {
         return parent(id: teacherId)
     }
     
+    var attachments: Children<Task, TaskAttachment> {
+        return children()
+    }
+    
     /// Creates a new Subject
     init(description: String, startDate: Double, endDate: Double, status: Int, mark: Int) {
         self.description = description
