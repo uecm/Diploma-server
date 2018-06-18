@@ -122,19 +122,15 @@ extension Droplet {
     
     private func setupFileRoutes() throws {
         
-//        // Get a file by name
-//        get("file", String.parameter) { (req) in
-//            let filename = try req.parameters.next(String.self)
-//            return DocumentFile(name: filename)
-//        }
-
-        
         // Download a file by path took from query
-        get("file/download") { req in
-            let json = req.json
-            guard let path = json?["link"]?.string else { throw Abort.badRequest }
+        post("file/download") { req in
+            
+            guard let path = req.json?["path"]?.string else {
+                throw Abort.badRequest
+            }
+            
             do {
-                return try Response(filePath: path)
+                return try Response(filePath: workingDirectory() + path)
             } catch {
                 throw Abort(.notFound)
             }
@@ -142,7 +138,8 @@ extension Droplet {
         
         // Get all the book names from Public/Books/ dir
         get("file/books") { req in
-            return try DocumentManager.books().makeJSON()
+            let json = try DocumentManager.books().makeJSON()
+            return json
         }
         
         // Upload a book
