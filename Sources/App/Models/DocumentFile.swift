@@ -15,7 +15,7 @@ final class DocumentFile: JSONConvertible {
     
     init(name: String?) {
         self.name = name
-        self.link = Config.hostname + "/download/" + (name ?? "")
+        self.link = Config.hostname + "/file/download/book/" + (name ?? "")
     }
     
     func makeJSON() throws -> JSON {

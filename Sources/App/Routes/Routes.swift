@@ -123,10 +123,10 @@ extension Droplet {
     private func setupFileRoutes() throws {
         
         get("file/books") { req in
-            // TODO
-            let path = Bundle.main.bundlePath
-            let files = try FileManager.default.contentsOfDirectory(atPath: path ?? "")
-            return try files.makeResponse()
+            let path = workingDirectory() + "/Public/Books"
+            let files = try FileManager.default.contentsOfDirectory(atPath: path)
+            let books = files.map{ DocumentFile.init(name: $0) }
+            return try books.makeJSON()
         }
         
         get("file", String.parameter) { (req) in
@@ -134,10 +134,10 @@ extension Droplet {
             return DocumentFile(name: filename)
         }
         
-        get("file/download", String.parameter) { req in
+        get("file/download/book", String.parameter) { req in
             let filename = try req.parameters.next(String.self)
             do {
-                return try DataFile().read(at: "Public/Books/\(filename).pdf").base64Encoded.makeString()
+                return try DataFile().read(at: "Public/Books/\(filename)").base64Encoded.makeString()
             } catch {
                 throw Abort(.notFound)
             }
