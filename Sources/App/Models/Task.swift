@@ -25,6 +25,7 @@ final class Task: Model {
     var endDate: Double
     var status: Int
     var mark: Int
+    var comment: String
     
     var subjectId: Identifier?
     var studentId: Identifier?
@@ -47,10 +48,11 @@ final class Task: Model {
     }
     
     /// Creates a new Subject
-    init(description: String, startDate: Double, endDate: Double, status: Int, mark: Int) {
+    init(description: String, startDate: Double, endDate: Double, status: Int, mark: Int, comment: String) {
         self.description = description
         self.startDate = startDate
         self.endDate = endDate
+        self.comment = comment
         self.status = status
         self.mark = mark
     }
@@ -64,6 +66,7 @@ final class Task: Model {
         description = try row.get("description")
         startDate = try row.get("startDate")
         endDate = try row.get("endDate")
+        comment = try row.get("comment")
         status = try row.get("status")
         mark = try row.get("mark")
         
@@ -78,6 +81,7 @@ final class Task: Model {
         try row.set("description", description)
         try row.set("startDate", startDate)
         try row.set("endDate", endDate)
+        try row.set("comment", comment)
         try row.set("status", status)
         try row .set("mark", mark)
         
@@ -104,6 +108,7 @@ extension Task: Preparation {
             builder.string("description")
             builder.double("startDate")
             builder.double("endDate")
+            builder.string("comment")
             builder.int("status")
             builder.int("mark")
         }
@@ -129,7 +134,8 @@ extension Task: JSONConvertible {
             startDate: json.get("startDate"),
             endDate: json.get("endDate"),
             status: json.get("status"),
-            mark: json.get("mark")
+            mark: json.get("mark"),
+            comment: json.get("comment")
         )
         id = try json.get("id")
     }
@@ -140,6 +146,7 @@ extension Task: JSONConvertible {
         try json.set("description", description)
         try json.set("startDate", startDate)
         try json.set("endDate", endDate)
+        try json.set("comment", comment)
         try json.set("status", status)
         try json.set("mark", mark)
         
@@ -152,6 +159,8 @@ extension Task: JSONConvertible {
         let teacher = try Teacher.find(teacherId)
         try json.set("teacher", teacher?.makeJSON())
     
+        try json.set("attachments", attachments.all().makeJSON())
+        
         return json
     }
 }

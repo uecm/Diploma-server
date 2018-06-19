@@ -78,6 +78,8 @@ extension Droplet {
                     throw Abort.badRequest
             }
             
+            guard data.count < 16000000 else { throw Abort.serverError }
+            
             guard let task = try Task.find(taskId) else {
                 throw Abort(.badRequest, reason: "Task with such id does not exist")
             }
@@ -87,7 +89,10 @@ extension Droplet {
             
             try attachment.save()
     
-            return Response.init(status: .ok)
+            var json = JSON()
+            try json.set("id", attachment.id ?? 0)
+            
+            return try Response.init(status: .ok, json: json)
         }
         
         
@@ -101,6 +106,23 @@ extension Droplet {
             let attachments = try task.attachments.all()
            
             return try attachments.makeJSON()
+        }
+        
+        token.patch("task/comment", Int.parameter) { (req) -> ResponseRepresentable in
+            let taskId = try req.parameters.next(Int.self)
+            
+            guard let task = try Task.find(taskId) else {
+                throw Abort(.badRequest, reason: "Task with such id does not exist")
+            }
+            
+            guard let comment = req.json?["comment"]?.string else {
+                throw Abort.badRequest
+            }
+            
+            task.comment = comment
+            try task.save()
+            
+            return Response(status: .ok)
         }
         
     }
